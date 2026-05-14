@@ -1,0 +1,19 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -O2
+
+all: numtool
+
+numtool: main.o parser.o math_utils.o
+	$(CC) $(CFLAGS) -o numtool main.o parser.o math_utils.o
+
+main.o: main.c parser.h
+	$(CC) $(CFLAGS) -c main.c
+
+parser.o: parser.c parser.h math_utils.h
+	$(CC) $(CFLAGS) -c parser.c
+
+math_utils.o: math_utils.c math_utils.h
+	$(CC) $(CFLAGS) -c math_utils.c
+
+clean:
+	rm -f *.o numtool numtool.exe
