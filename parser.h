@@ -1,16 +1,17 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-// linked List düğümü tanımı
-typedef struct CommandRecord {
-    char command[20];
-    long long args[4];
-    int arg_count;
-    char result[100];
-    int is_error; 
-    struct CommandRecord *next; // bir sonraki komutu tutacak pointer 
-} CommandRecord;
+// bağlı liste düğüm yapısı
+typedef struct KomutDugumu
+{
+    char komut_adi[20];
+    long long argumanlar[4];
+    int arg_sayisi;
+    char cikti_mesaji[100];
+    int hata_var_mi;
+    struct KomutDugumu *sonraki;
+} KomutDugumu;
 
-void process_file(const char *giris_dosyasi, const char *cikis_dosyasi);
+void dosya_islemlerini_yurut(const char *giris_dosyasi, const char *cikis_dosyasi);
 
 #endif
