@@ -1,0 +1,228 @@
+PROGRAMLAMA II DÖNEM ÖDEVİ PROJE RAPORU
+
+Proje Adı: NumTool - Sayı Teorisi Hesaplama Aracı
+Repo Adı: Bilimsel-Hesap-makinesi
+Ders: Programlama II
+Programlama Dili: C
+Hazırlayanlar: Batuhan Ceyhan ve Yunus Emre Karaslan
+Öğrenci Numaraları: 434368 ve 434391
+
+
+1. PROJENİN AMACI
+
+Bu proje, C programlama dili kullanılarak geliştirilen komut tabanlı bir sayı teorisi hesaplama aracıdır. Projede amaç, yalnızca temel matematiksel işlemleri yapmak değil, aynı zamanda dosya okuma-yazma, komut satırı argümanlarıyla çalışma, metin ayrıştırma, modüler programlama, dinamik bellek kullanımı ve Makefile ile derleme gibi konuları bir bütün halinde uygulamaktır.
+
+Program, kullanıcıdan doğrudan işlem seçmesini istemek yerine bir giriş dosyasında yazılı olan komutları okur. Okunan komutlar program içerisinde ayrıştırılır, gerekli matematiksel işlem yapılır ve sonuçlar bir çıkış dosyasına yazdırılır. Bu yönüyle proje, komut satırından çalışan ve dosya tabanlı işlem yapan basit ama düzenli bir hesaplama aracı olarak tasarlanmıştır.
+
+Bu projeyi hazırlarken iki kişi olarak özellikle kodun modüllere ayrılmasına, her dosyanın kendi görevini yapmasına ve işlemlerin daha okunabilir olmasına dikkat ettik. Böylece main.c dosyasında sadece genel akış bırakılmış, matematiksel hesaplamalar ayrı bir dosyada, dosya okuma ve komut ayrıştırma işlemleri ise ayrı bir parser dosyasında toplanmıştır.
+
+
+2. PROJENİN GENEL ÇALIŞMA MANTIĞI
+
+Program komut satırından çalıştırılacak şekilde hazırlanmıştır. Kullanıcı programı çalıştırırken iki dosya adı verir. Birinci dosya giriş dosyasıdır, ikinci dosya ise sonuçların yazılacağı çıkış dosyasıdır. Program giriş dosyasını satır satır okur, satırlarda bulunan komutları ayırır ve her komutu işledikten sonra sonucu çıkış dosyasına yazar.
+
+Programın beklenen kullanım şekli şu şekildedir:
+
+Linux veya macOS için:
+./numtool giris.txt cikis.txt
+
+Windows için:
+.\numtool.exe giris.txt cikis.txt
+
+main fonksiyonu ilk olarak argüman sayısını kontrol eder. Eğer kullanıcı programı doğru biçimde çalıştırmazsa ekrana hatalı kullanım mesajı verilir ve program sonlandırılır. Bu kontrol, dosya adları eksik girildiğinde programın yanlış çalışmasını engellemek için yapılmıştır.
+
+Programın genel çalışma sırası şu şekilde anlatılabilir:
+
+Önce komut satırı argümanları kontrol edilir. Daha sonra giriş dosyası okuma moduna, çıkış dosyası ise yazma moduna açılır. Giriş dosyasındaki satırlar fgets fonksiyonu ile okunur. Okunan satırlarda boş satır ya da yorum satırı varsa bunlar işleme alınmaz. Aynı satırda birden fazla komut varsa noktalı virgül işaretine göre ayrılır. Ayrılan her komut sscanf ile okunur, komut adı ve parametreleri belirlenir. Komuta göre ilgili matematiksel fonksiyon çağrılır. Oluşan sonuç bağlı liste yapısındaki düğümlerde saklanır. Dosya okuma bittikten sonra listedeki sonuçlar çıkış dosyasına yazılır. En sonunda açılan dosyalar kapatılır ve malloc ile alınan bellek free ile geri verilir.
+
+
+3. PROJE DOSYA YAPISI
+
+Projede kodlar tek bir dosyada yazılmamıştır. Daha düzenli ve anlaşılır olması için proje birden fazla dosyaya bölünmüştür.
+
+main.c dosyası programın başlangıç noktasıdır. Bu dosyada argc ve argv kullanılarak komut satırı argümanları kontrol edilir. Kullanıcıdan giriş ve çıkış dosyası alınır. Eğer kullanım doğruysa parser modülündeki dosya_islemlerini_yurut fonksiyonu çağrılır. Bu dosyada matematiksel işlemlerin detayına girilmez.
+
+parser.c dosyası dosya okuma, satırları ayırma, komutları çözümleme ve sonuçları listeye ekleme işlemlerinden sorumludur. Giriş dosyasındaki satırlar burada okunur. Aynı satırda bulunan birden fazla komut noktalı virgülle ayrılır. Komut adı ve sayısal değerler sscanf ile alınır. Komutun türüne göre ilgili matematiksel fonksiyon çağrılır. Sonuçlar daha sonra çıkış dosyasına yazılır.
+
+parser.h dosyası parser.c içerisinde kullanılan yapıların ve fonksiyon prototiplerinin tanımlandığı başlık dosyasıdır. Böylece main.c dosyası parser.c içindeki fonksiyonları düzenli şekilde kullanabilir.
+
+math_utils.c dosyası projenin matematiksel algoritmalarının bulunduğu dosyadır. GCD, modüler üs alma, asal kontrolü, modüler ters ve Euler Phi fonksiyonu bu dosyada tanımlanmıştır. Bu sayede hesaplama işlemleri parser dosyasından ayrılmış ve kodun daha modüler olması sağlanmıştır.
+
+math_utils.h dosyası math_utils.c içinde yazılan matematiksel fonksiyonların prototiplerini içerir. Bu başlık dosyası parser.c tarafından dahil edilerek fonksiyonlara erişim sağlanır.
+
+Makefile dosyası projenin tek komutla derlenmesi için hazırlanmıştır. make komutu çalıştırıldığında main.c, parser.c ve math_utils.c dosyaları ayrı ayrı derlenir ve numtool adlı çalıştırılabilir dosya oluşturulur. clean hedefi ile nesne dosyaları ve çalıştırılabilir dosya temizlenebilir.
+
+Projede ayrıca giris.txt ve cikis.txt dosyaları örnek testler için kullanılmıştır. giris.txt dosyasında komutlar bulunur, cikis.txt dosyasında ise programın ürettiği sonuçlar yer alır.
+
+
+4. KOMUT SATIRI ARGÜMANLARI VE DOSYA İŞLEMLERİ
+
+Programın komut satırıyla çalışması ödevin önemli isterlerinden biridir. Bu nedenle main fonksiyonunda argc değeri kontrol edilmiştir. Programın çalışması için toplam üç argüman gerekir. Bunlardan birincisi programın kendi adıdır, ikincisi giriş dosyası, üçüncüsü ise çıkış dosyasıdır.
+
+Eğer argc değeri 3 değilse kullanıcıya hatalı kullanım yaptığı bildirilir. Bu durumda program devam etmez ve return 1 ile sonlandırılır. Bu kontrol sayesinde eksik dosya adı verilmesi gibi durumlarda programın dosya açma aşamasında hataya düşmesi önlenmiştir.
+
+Dosya işlemleri parser modülünde yapılmaktadır. Giriş dosyası fopen fonksiyonu ile okuma modunda açılır. Eğer dosya açılamazsa hata mesajı yazdırılır. Çıkış dosyası ise yazma modunda açılır. Çıkış dosyası açılamazsa giriş dosyası kapatılır ve işlem sonlandırılır. Bu şekilde dosya açma ve kapatma işlemlerinde gereksiz kaynak kullanımı önlenmeye çalışılmıştır.
+
+
+5. GİRDİ DOSYASININ OKUNMASI VE KOMUTLARIN AYRIŞTIRILMASI
+
+Program giriş dosyasını satır satır okumaktadır. Bunun için fgets fonksiyonu kullanılmıştır. fgets kullanılması, satır okuma işlemini daha güvenli hale getirir çünkü okunacak karakter sayısı sınırlandırılabilir.
+
+Giriş dosyasında boş satırlar bulunabilir. Program bu satırları işleme almadan geçer. Ayrıca # karakteri ile başlayan satırlar yorum satırı olarak kabul edilir. Bu satırlar da hesaplamaya dahil edilmez. Bu özellik, test dosyalarının daha okunabilir hazırlanmasını sağlar.
+
+Aynı satırda birden fazla komut bulunması durumunda komutlar noktalı virgül işaretine göre ayrılır. Bunun için strtok fonksiyonu kullanılmıştır. Böylece örneğin aynı satırda “GCD 48 18; POW 2 10 1000” gibi iki ayrı komut varsa program bunları ayrı ayrı işler.
+
+Komutun adı ve parametreleri sscanf fonksiyonu ile okunur. Önce komut adı alınır, daha sonra long long türündeki sayısal argümanlar okunur. Komutun beklenen parametre sayısına göre kontrol yapılır. Örneğin GCD komutu iki parametre, POW komutu üç parametre, PRIME komutu ise bir parametre bekler.
+
+Bu ayrıştırma yapısı sayesinde program farklı komutları tek bir giriş dosyası üzerinden sıralı biçimde çalıştırabilmektedir.
+
+
+6. DİNAMİK VERİ YAPISI KULLANIMI
+
+Ödevde her komut ve sonucunun dinamik bir veri yapısı içinde tutulması istenmiştir. Bu projede bunun için bağlı liste yapısı kullanılmıştır. Her komut için bellekte bir düğüm oluşturulur. Bu düğümün içinde komut adı, argümanlar, argüman sayısı, çıktı mesajı, hata bilgisi ve sonraki düğümü gösteren işaretçi bulunur.
+
+Her yeni komut okunduğunda malloc ile yeni bir KomutDugumu oluşturulur. Oluşturulan düğüm, bağlı listenin sonuna eklenir. Böylece giriş dosyasında kaç komut olduğu önceden bilinmese bile program bütün komutları sırayla bellekte tutabilir. Sabit boyutlu büyük bir dizi kullanmak yerine bağlı liste kullanılması belleğin daha esnek kullanılmasını sağlar.
+
+Dosya okuma işlemi tamamlandıktan sonra bağlı listenin başından sonuna kadar gidilir ve her komutun sonucu çıkış dosyasına yazdırılır. Daha sonra liste tekrar gezilerek her düğüm free fonksiyonu ile serbest bırakılır. Bu işlem bellek sızıntısı oluşmaması için önemlidir.
+
+
+7. DESTEKLENEN KOMUTLAR
+
+Projede altı temel komut desteklenmektedir. Bunlar GCD, POW, PRIME, INV, PHI ve CHECK komutlarıdır.
+
+GCD komutu iki sayının en büyük ortak bölenini hesaplar. Bu işlem için Öklid algoritması kullanılmıştır. Örneğin GCD 48 18 komutu için sonuç 6 olur.
+
+POW komutu taban, üs ve mod değerleri alır. Taban üzeri üs işlemini verilen moda göre hesaplar. Büyük üslerde klasik çarpma yöntemi çok uzun sürebileceği için hızlı üs alma yöntemi kullanılmıştır. Örneğin POW 2 10 1000 komutu için sonuç 24 olur.
+
+PRIME komutu verilen sayının asal olup olmadığını kontrol eder. Sonuç asal sayı ise YES, asal değilse NO olarak yazılır. N değeri 2'den küçükse geçersiz giriş olarak değerlendirilir.
+
+INV komutu bir sayının verilen moda göre modüler tersini hesaplar. Eğer sayı ile mod aralarında asal değilse modüler ters yoktur ve ERROR_NO_INVERSE çıktısı verilir. Örneğin INV 3 11 komutunda 3 sayısının 11 modundaki tersi 4 olduğu için sonuç 4 olur.
+
+PHI komutu Euler Totient fonksiyonunu hesaplar. Bu fonksiyon, 1 ile N arasında N ile aralarında asal olan sayıların adedini verir. Örneğin PHI 36 komutu için sonuç 12 olur.
+
+CHECK komutu modüler ters sonucunun doğruluğunu kontrol eder. Önce A değerinin M modundaki tersi bulunur. Daha sonra A ile ters değer çarpılır ve M moduna göre sonuç kontrol edilir. Sonuç 1 ise CORRECT yazılır. Ters yoksa ERROR_NO_INVERSE çıktısı verilir.
+
+
+8. KULLANILAN ALGORİTMALAR
+
+GCD işlemi için Öklid algoritması kullanılmıştır. Bu algoritmada iki sayıdan büyük olan sayı küçük olana göre mod alınarak küçültülür. Döngü, ikinci sayı sıfır olana kadar devam eder. İkinci sayı sıfır olduğunda birinci sayı en büyük ortak bölen olarak elde edilir. Bu algoritma hızlı çalışır ve büyük sayılarda klasik bölen arama yöntemine göre çok daha verimlidir.
+
+POW işlemi için ikili üs alma yöntemi kullanılmıştır. Bu yöntemde üs değeri her adımda ikiye bölünür. Eğer üs tek ise mevcut sonuç taban ile çarpılıp moda göre güncellenir. Her adımda tabanın karesi alınır ve yine mod işlemi uygulanır. Bu sayede işlem O(log b) karmaşıklığında yapılır. Çarpımlardan sonra mod alınması, sayıların gereksiz büyümesini ve taşma riskini azaltır.
+
+PRIME işlemi için optimize edilmiş asallık testi uygulanmıştır. Önce 1 ve daha küçük sayılar reddedilir. 2 ve 3 asal kabul edilir. Çift sayılar ve 3'ün katları elendikten sonra döngü 5 değerinden başlar. Döngüde sadece 6k - 1 ve 6k + 1 formundaki sayılar kontrol edilir. Bu yöntem, gereksiz bölme işlemlerini azaltır.
+
+INV işlemi için genişletilmiş Öklid algoritmasına dayalı modüler ters hesabı yapılmıştır. Bir sayının modüler tersinin olabilmesi için sayı ile modun en büyük ortak böleninin 1 olması gerekir. Eğer GCD sonucu 1 değilse modüler ters yoktur. Ters değer negatif çıkarsa pozitif modüler aralığa getirilir.
+
+PHI işlemi için asal çarpanlara ayırma yöntemi kullanılmıştır. Sayının asal bölenleri bulundukça sonuç değeri “sonuc = sonuc - sonuc / p” mantığıyla güncellenir. Bu işlemde float ya da double kullanılmamış, tam sayı işlemleri tercih edilmiştir. Böylece hassasiyet kaybı oluşmasının önüne geçilmiştir.
+
+CHECK komutunda modüler ters fonksiyonu tekrar kullanılmıştır. Ters bulunduktan sonra A ile ters değer çarpılıp M moduna göre kontrol edilir. Sonuç 1 ise modüler tersin doğru olduğu kabul edilir.
+
+
+9. HATA KONTROLLERİ
+
+Projede geçersiz girişlere karşı çeşitli hata kontrolleri yapılmıştır. GCD komutunda negatif ya da sıfır değerler geçersiz kabul edilmiştir. POW komutunda üs değeri negatifse veya mod değeri sıfır ya da daha küçükse ERROR_INVALID_INPUT sonucu verilir. PRIME komutunda 2'den küçük değerler geçersiz sayılır. PHI komutunda 1'den küçük değerler geçersizdir.
+
+INV ve CHECK komutlarında ise modüler tersin var olup olmadığı kontrol edilir. Eğer verilen iki sayı aralarında asal değilse ters bulunamaz. Bu durumda ERROR_NO_INVERSE çıktısı üretilir.
+
+Programda ayrıca bilinmeyen komutlar için ERROR_UNKNOWN_COMMAND çıktısı oluşturulmuştur. Böylece giriş dosyasında desteklenmeyen bir komut yazıldığında program tamamen durmak yerine bu komut için hata sonucu üretir ve diğer komutları işlemeye devam eder.
+
+Dosya açma işlemlerinde de hata kontrolü yapılmıştır. Giriş dosyası açılamazsa kullanıcı bilgilendirilir. Çıkış dosyası açılamazsa daha önce açılan giriş dosyası kapatılarak işlem güvenli şekilde sonlandırılır.
+
+
+10. ÇIKTI DOSYASI FORMATI
+
+Program sonuçları çıkış dosyasına komut adı, parametreler ve sonuç olacak şekilde yazar. Genel çıktı biçimi şu şekildedir:
+
+KOMUT parametreler -> sonuç
+
+Örnek olarak:
+
+GCD 48 18 -> 6
+POW 2 10 1000 -> 24
+PRIME 29 -> YES
+INV 3 11 -> 4
+PHI 36 -> 12
+CHECK 1234567 1000000007 -> CORRECT
+
+Hatalı girişlerde de aynı biçim korunur. Sadece sonuç kısmında hata mesajı yer alır.
+
+Örnek hata çıktıları:
+
+INV 4 8 -> ERROR_NO_INVERSE
+PRIME 1 -> ERROR_INVALID_INPUT
+GCD -5 10 -> ERROR_INVALID_INPUT
+
+Bu format, hem okunabilir hem de test edilmesi kolay bir çıktı yapısı sağlar.
+
+
+11. TEST SÜRECİ
+
+Projeyi test ederken temel işlemleri, hata kontrollerini ve büyük sayılarla çalışmayı kapsayan örnekler kullanılmıştır. İlk olarak küçük sayılarla GCD, POW, PRIME, INV ve PHI komutlarının doğru sonuç üretip üretmediği kontrol edilmiştir. Daha sonra hatalı girişler denenmiştir. Örneğin aralarında asal olmayan iki sayı için INV komutu kullanıldığında ERROR_NO_INVERSE çıktısı alınması beklenmiştir.
+
+Ayrıca performans açısından daha büyük değerler de denenmiştir. POW komutunda büyük üs değerlerinin hızlı üs alma yöntemiyle kısa sürede hesaplanması beklenir. PRIME komutunda büyük asal sayıların kontrolü için 6k - 1 ve 6k + 1 optimizasyonu kullanıldığı için gereksiz denemeler azaltılmıştır. PHI komutunda da asal çarpanlara ayırma yöntemi ile sonuç hesaplanmıştır.
+
+Test sürecinde aynı satırda birden fazla komutun bulunması da denenmiştir. Noktalı virgül ile ayrılan komutların ayrı ayrı işlendiği görülmüştür. Böylece parser kısmının yalnızca satır satır değil, satır içindeki çoklu komutlarda da çalışması sağlanmıştır.
+
+
+12. KODUN MODÜLER YAPISININ SAĞLADIĞI AVANTAJLAR
+
+Projede kodların farklı dosyalara ayrılması, projenin daha okunabilir olmasını sağlamıştır. main.c dosyası kısa tutulmuştur ve yalnızca programın giriş kontrolünü yapmaktadır. parser.c dosyası dosya işlemleri ve komut çözümleme kısmını üstlenmiştir. math_utils.c dosyasında ise matematiksel algoritmalar yer almaktadır.
+
+Bu ayrım sayesinde herhangi bir algoritmada değişiklik yapılmak istendiğinde sadece math_utils.c dosyasıyla ilgilenmek yeterlidir. Giriş dosyası okuma ya da çıktı formatı ile ilgili bir değişiklik yapılacaksa parser.c üzerinde çalışılır. Bu durum kod bakımını kolaylaştırır.
+
+Ayrıca başlık dosyalarının kullanılması, fonksiyon prototiplerinin düzenli tutulmasını sağlamıştır. Böylece C dilinde çok dosyalı proje yapısına daha uygun bir mimari oluşturulmuştur.
+
+
+13. MAKEFILE KULLANIMI
+
+Projede Makefile kullanılmıştır. Bu dosya sayesinde bütün kaynak dosyalar tek tek elle gcc komutuyla derlenmek zorunda kalmaz. Terminalde make komutu yazıldığında main.o, parser.o ve math_utils.o nesne dosyaları oluşturulur ve ardından bu dosyalar birleştirilerek numtool çalıştırılabilir dosyası üretilir.
+
+Makefile içinde kullanılan CFLAGS değerleri -Wall, -Wextra ve -O2 olarak ayarlanmıştır. -Wall ve -Wextra derleme sırasında uyarıların daha ayrıntılı görülmesini sağlar. -O2 ise optimizasyon seçeneğidir.
+
+clean hedefi sayesinde derleme sonucunda oluşan nesne dosyaları ve çalıştırılabilir dosya temizlenebilir. Bu da projeyi yeniden derlemeden önce temiz bir başlangıç yapmayı kolaylaştırır.
+
+
+14. İŞ BÖLÜMÜ
+
+Bu proje iki kişi olarak hazırlanmıştır. Çalışma sırasında görevleri tamamen birbirinden koparmak yerine birlikte kontrol ederek ilerledik. Genel olarak birimiz dosya okuma, komut ayrıştırma ve bağlı liste yapısı üzerinde çalışırken diğerimiz matematiksel algoritmalar ve Makefile düzeni üzerinde yoğunlaştı. Daha sonra kodlar birleştirildi ve birlikte test edildi.
+
+main.c dosyasındaki argüman kontrolü ve genel akış basit tutulduğu için bu kısım birlikte gözden geçirildi. parser.c dosyasında özellikle giriş dosyasındaki satırların okunması, noktalı virgül ile ayrılan komutların işlenmesi ve sonuçların bağlı listeye eklenmesi üzerinde duruldu. math_utils.c dosyasında ise GCD, POW, PRIME, INV ve PHI fonksiyonlarının ödevde istenen karmaşıklıklara uygun çalışmasına dikkat edildi.
+
+Test dosyası hazırlama ve çıktıların kontrol edilmesi de iki kişi tarafından yapıldı. Böylece hem kodun çalışması hem de raporda anlatılan bölümlerin projeye uygun olması sağlandı.
+
+
+15. KARŞILAŞILAN ZORLUKLAR
+
+Projede en çok dikkat edilmesi gereken kısımlardan biri parser yapısı olmuştur. Çünkü giriş dosyasında tek satırda birden fazla komut bulunabilmektedir. Bu komutları ayırmak için strtok kullanmak ve daha sonra her komutun parametrelerini sscanf ile okumak başlangıçta dikkat isteyen bir kısımdı.
+
+Bir diğer önemli konu dinamik bellek yönetimidir. Her komut için malloc ile yeni düğüm oluşturulduğundan, program sonunda bu düğümlerin free ile serbest bırakılması gerekmektedir. Aksi halde bellek sızıntısı oluşabilir. Bu yüzden bağlı liste yazıldıktan sonra listeyi serbest bırakan bölüm özellikle eklenmiştir.
+
+Matematiksel algoritmalarda da büyük sayılarla çalışırken doğru yöntemleri kullanmak önemlidir. POW komutunda normal döngüyle üs alma yerine ikili üs alma yönteminin kullanılması gerekti. PRIME komutunda da tüm sayıları denemek yerine daha optimize bir kontrol uygulanmıştır. PHI fonksiyonunda ise kesirli sayı kullanmadan tam sayı işlemleriyle sonuç üretmeye dikkat edilmiştir.
+
+
+16. PROJENİN ÖDEV İSTERLERİYLE UYUMU
+
+Proje, komut satırından çalışacak şekilde hazırlanmıştır. main fonksiyonu argüman sayısını kontrol etmektedir. Kodlar tek dosyada toplanmamış, main.c, parser.c ve math_utils.c gibi modüllere ayrılmıştır. Ayrıca Makefile ile derleme desteği eklenmiştir.
+
+Girdi dosyası satır satır okunmakta, aynı satırdaki birden fazla komut noktalı virgülle ayrılmaktadır. Komutlar ve parametreler sscanf ile çözümlenmektedir. Sonuçlar çıkış dosyasına istenen formata uygun şekilde yazılmaktadır.
+
+Dinamik veri yapısı olarak bağlı liste kullanılmıştır. Her komut için malloc ile yeni düğüm oluşturulmakta ve program sonunda free ile belleğe iade edilmektedir.
+
+GCD, POW, PRIME, INV, PHI ve CHECK komutları desteklenmektedir. Bu komutlar için gerekli hata kontrolleri yapılmıştır. Büyük sayılarla işlem yapabilmek için özellikle POW ve PRIME fonksiyonlarında daha verimli algoritmalar tercih edilmiştir.
+
+
+17. SONUÇ
+
+Bu proje sayesinde C dilinde çok dosyalı proje geliştirme, dosya okuma-yazma, komut satırı argümanlarıyla çalışma, string parsing, dinamik bellek yönetimi ve temel sayı teorisi algoritmalarını uygulama konularında pratik yapılmıştır.
+
+Programın en önemli tarafı, her komutu giriş dosyasından okuyup sırayla işleyebilmesi ve sonuçları düzenli şekilde çıkış dosyasına yazabilmesidir. Ayrıca bağlı liste kullanılarak komut sayısının önceden bilinmediği durumlara uygun bir yapı kurulmuştur.
+
+Sonuç olarak NumTool projesi, Programlama II dersi kapsamında istenen temel yapıları bir araya getiren, modüler ve dosya tabanlı çalışan bir C uygulaması olmuştur. Projeyi hazırlarken hem algoritmaların doğru çalışmasına hem de kodun okunabilir ve savunulabilir olmasına dikkat edilmiştir.
+
+
+18. KAYNAKÇA
+
+Programlama II dönem ödevi yönergesi
+C programlama dili ders notları
+C standart kütüphanesi kullanımı
+Projede hazırlanan main.c, parser.c, parser.h, math_utils.c, math_utils.h ve Makefile dosyaları
